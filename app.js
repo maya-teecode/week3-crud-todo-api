@@ -11,9 +11,24 @@ let todos = [
 app.get('/todos', (req, res) => {
   res.status(200).json(todos); // Send array as JSON
 });
+app.get('/todos/active', (req, res) => {
+  const done = todos.filter((t) => !t.completed);
+  res.status(200).json(done);
+  console.log(done);
+});
+
+app.get('/todos/:id', (req, res) => {
+  const oneTodo = todos.find((t) => t.id === parseInt(req.params.id));
+  if (!oneTodo) return res.status(404).json({ message: 'Todo not found' });
+  res.status(200).json(oneTodo);
+});
+
 
 // POST New – Create
 app.post('/todos', (req, res) => {
+  const {task} = req.body;
+  if (!task)  
+      return res.status(400).json({ error: 'Task is required' }); // Basic validation
   const newTodo = { id: todos.length + 1, ...req.body }; // Auto-ID
   todos.push(newTodo);
   res.status(201).json(newTodo); // Echo back
@@ -46,5 +61,5 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Server error!' });
 });
 
-const PORT = 3002;
+const PORT = 3004;
 app.listen(PORT, () => console.log(`Server on port ${PORT}`));
